@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"sort"
 	"strconv"
@@ -59,8 +60,8 @@ func findTwoFactors(number uint64, start uint64, isPrime []bool) []uint64 {
 	// If the number is a prime, it returns 1 and the number itself
 
 	// TODO: Fast integer square root. Potentially useless due to modern hardware sqrt functions
-	// limit := uint64(math.Sqrt(float64(number)))
-	limit := iSqrt(number)
+	limit := uint64(math.Sqrt(float64(number)))
+	// limit := iSqrt(number)
 	factors := make([]uint64, 2)
 
 	for i := start; i <= limit; i++ {
@@ -99,8 +100,8 @@ func findAllFactors(number uint64) []uint64 {
 
 	// Biggest prime factor cannot be higher than the sqrt
 	// TODO: Fast integer square root. Potentially useless due to modern hardware sqrt functions
-	// maxFactor := uint64(math.Sqrt(float64(number)))
-	maxFactor := iSqrt(number)
+	maxFactor := uint64(math.Sqrt(float64(number)))
+	// maxFactor := iSqrt(number)
 
 	isPrime := make([]bool, maxFactor+1) // +1 to ensure off by one. 0 is effectively never used
 
@@ -166,9 +167,6 @@ func prettifyFactors(groupedFactors map[uint64]uint64) string {
 	for k := range groupedFactors {
 		keys = append(keys, k)
 	}
-	// Source - https://stackoverflow.com/a/48568680
-	// Posted by vicentazo, modified by community. See post 'Timeline' for change history
-	// Retrieved 2026-02-02, License - CC BY-SA 3.0
 	sort.Slice(keys, func(i, j int) bool { return keys[i] < keys[j] })
 
 	for _, k := range keys {
@@ -188,52 +186,40 @@ func prettifyFactors(groupedFactors map[uint64]uint64) string {
 	return output
 }
 
-func iSqrt(number uint64) uint64 {
-	// Initializing with quick lookup table for performance
-	if number < 4 {
-		return 1
-	} else if number < 9 {
-		return 2
-	} else if number < 16 {
-		return 3
-	} else if number < 25 {
-		return 4
-	} else if number < 36 {
-		return 5
-	} else if number < 49 {
-		return 6
-	} else if number < 64 {
-		return 7
-	} else if number < 81 {
-		return 8
-	} else if number < 100 {
-		return 9
-	}
+// func iSqrt(number uint64) uint64 {
+// 	// Initializing with quick lookup table for performance
+// 	LUP := [15]uint64{1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225}
 
-	// For 100 and above the square root cannot be > 1/10th of the number
-	// The lookup table effectively reduced the subject by an order or magnitude
-	// Binary search reduces by 3 iterations (2^3) and a little more
-	limit := number / 10
-	var low, mid, high uint64
-	low = 2
-	mid = (limit + 2) / 2
-	high = limit
+// 	var i uint64
+// 	for i = 1; i < uint64(len(LUP)); i++ {
+// 		if number < i {
+// 			return LUP[i]
+// 		}
+// 	}
+// 	// For 100 and above the square root cannot be > 1/10th of the number
+// 	// The lookup table effectively reduced the subject by an order or magnitude
+// 	// Binary search reduces by 3 iterations (2^3) and a little more
+// 	limit := number / 16
+// 	var low, mid, high uint64
+// 	low = 2
+// 	mid = (limit + 2) / 2
+// 	high = limit
 
-	for (high - low) > 1 {
-		if (mid * mid) == number {
-			return mid
-		} else if (mid * mid) > number {
-			high = mid
-			mid = (low + high) / 2
-		} else if (mid * mid) < number {
-			low = mid
-			mid = (low + high) / 2
-		}
-	}
+// 	for (high - low) > 1 {
+// 		if (mid * mid) == number {
+// 			return mid
+// 		} else if (mid * mid) > number {
+// 			high = mid
+// 			mid = (low + high) / 2
+// 		} else if (mid * mid) < number {
+// 			low = mid
+// 			mid = (low + high) / 2
+// 		}
+// 	}
 
-	fmt.Printf("square root of %d is %d\n", number, mid)
-	return mid
-}
+// 	// fmt.Printf("square root of %d is %d\n", number, mid)
+// 	return mid
+// }
 
 // func verifyPrime(number int) {
 // 	bigNumber := new(big.Int)
