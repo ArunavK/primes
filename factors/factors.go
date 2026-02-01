@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"sort"
 	"strconv"
@@ -38,6 +39,9 @@ func main() {
 
 	// Group all prime factors into a hashmap. The bases are keys and exponents are values
 	groupedFactors := groupPowers(allFactors)
+	// for key := range groupedFactors {
+	// 	verifyPrime(key)
+	// }
 
 	// Create a formatted string for prime factors
 	output := prettifyFactors(groupedFactors)
@@ -54,24 +58,24 @@ func findTwoFactors(number int, start int, isPrime []bool) []int {
 	// Function to take an integer as an input and return the smallest and biggest factors
 	// The smallest factor can only be a prime number (mathemetical certainty)
 	// If the number is a prime, it returns 1 and the number itself
+	limit := int(math.Sqrt(float64(number)))
 	factors := make([]int, 2)
-	// isPrime := make([]bool, number+1)
 
-	// for i := 2; i <= number; i++ {
-	// 	isPrime[i] = true
-	// }
-
-	for i := start; i*i <= number; i++ {
-		if isPrime[i] {
-			for j := i * i; j <= number; j += i {
-				isPrime[j] = false
-			}
-		}
-
-		if !isPrime[number] {
+	for i := start; i <= limit; i++ {
+		// Checking if i is a factor. Early exit if it is
+		if number%i == 0 {
 			factors[0] = i
 			factors[1] = number / i
 			return factors
+		}
+
+		// Updating the sieve for future iterations
+		if isPrime[i] {
+			for j := i * i; j <= limit; j += i {
+				// i * i is where we start with because lower values like 2 * i are already evaluated
+				// j <= limit for quick exit. This makes the sieve incomplete, but we do not care about larger values anyway
+				isPrime[j] = false
+			}
 		}
 	}
 
@@ -83,6 +87,7 @@ func findTwoFactors(number int, start int, isPrime []bool) []int {
 func findAllFactors(number int) []int {
 	// Function that returns all prime factors of a number as an array
 	// If input is prime, it returns 1 and the number itself
+	maxFactor := int(math.Sqrt(float64(number)))
 
 	if number < 2 {
 		fmt.Printf("%d does not have any factors.\n", number)
@@ -96,8 +101,8 @@ func findAllFactors(number int) []int {
 	small := 1
 	large := number
 
-	isPrime := make([]bool, number+1)
-	for i := 2; i <= number; i++ {
+	isPrime := make([]bool, maxFactor+1)
+	for i := 2; i <= maxFactor; i++ {
 		isPrime[i] = true
 	}
 	start := 2
@@ -172,3 +177,9 @@ func prettifyFactors(groupedFactors map[int]int) string {
 	}
 	return output
 }
+
+// func verifyPrime(number int) {
+// 	bigNumber := new(big.Int)
+// 	fmt.Sscan(strconv.Itoa(number), bigNumber)
+// 	fmt.Printf("%d is probably prime: %v\n", number, bigNumber.ProbablyPrime(20))
+// }
