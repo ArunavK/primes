@@ -50,18 +50,18 @@ func main() {
 	fmt.Printf("Factors are:\n %s", output)
 }
 
-func findTwoFactors(number int) []int {
+func findTwoFactors(number int, start int, isPrime []bool) []int {
 	// Function to take an integer as an input and return the smallest and biggest factors
 	// The smallest factor can only be a prime number (mathemetical certainty)
 	// If the number is a prime, it returns 1 and the number itself
 	factors := make([]int, 2)
-	isPrime := make([]bool, number+1)
+	// isPrime := make([]bool, number+1)
 
-	for i := 2; i <= number; i++ {
-		isPrime[i] = true
-	}
+	// for i := 2; i <= number; i++ {
+	// 	isPrime[i] = true
+	// }
 
-	for i := 2; i*i <= number; i++ {
+	for i := start; i*i <= number; i++ {
 		if isPrime[i] {
 			for j := i * i; j <= number; j += i {
 				isPrime[j] = false
@@ -92,11 +92,19 @@ func findAllFactors(number int) []int {
 
 	var allFactors []int
 	factors := make([]int, 2)
+
 	small := 1
 	large := number
 
+	isPrime := make([]bool, number+1)
+	for i := 2; i <= number; i++ {
+		isPrime[i] = true
+	}
+	start := 2
+
 	for i := 0; i < MAX_ITER; i++ {
-		factors = findTwoFactors(large)
+		// Reuse same sieve for future computations
+		factors = findTwoFactors(large, start, isPrime)
 		small = factors[0]
 		large = factors[1]
 
@@ -110,6 +118,7 @@ func findAllFactors(number int) []int {
 			break
 		}
 		allFactors = append(allFactors, small)
+		start = small
 	}
 	return allFactors
 }
